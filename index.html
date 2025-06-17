@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohamedh Vathudh | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom CSS */
+        :root {
+            --primary: #6366f1;
+            --secondary: #4f46e5;
+            --accent: #f59e0b;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gradient-start: #8b5cf6;
+            --gradient-end: #6366f1;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            transform-style: preserve-3d;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.2) 0%, transparent 50%);
+            transform: translateZ(-1px);
+        }
+        
+        .card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform-style: preserve-3d;
+            border-radius: 16px;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(79,70,229,0.1) 100%);
+            transform: translateZ(-1px);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .skill-bar {
+            height: 12px;
+            background-color: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .skill-progress {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1s cubic-bezier(0.65, 0, 0.35, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skill-progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                            rgba(255,255,255,0.1) 0%, 
+                            rgba(255,255,255,0.3) 50%, 
+                            rgba(255,255,255,0.1) 100%);
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .contact-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IGlkPSJwYXR0ZXJuLWJnIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ3aGl0ZSI+PC9yZWN0PjxjaXJjbGUgZmlsbD0iI2YxZjVmYSIgY3g9IjIwIiBjeT0iMjAiIHI9IjEiPjwvY2lyY2xlPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNwYXR0ZXJuKSIgaGVpZ2h0PSIxMDAlIiB3aWR0aD0iMTAwJSI+PC9yZWN0Pjwvc3ZnPg==')]">
+    <!-- Navigation -->
+    <nav class="fixed w-full bg-white shadow-md z-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="#home" class="text-xl font-bold text-blue-600">MV</a>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link text-gray-700 hover:text-blue-600">Home</a>
+                    <a href="#about" class="nav-link text-gray-700 hover:text-blue-600">About</a>
+                    <a href="#skills" class="nav-link text-gray-700 hover:text-blue-600">Skills</a>
+                    <a href="#education" class="nav-link text-gray-700 hover:text-blue-600">Education</a>
+                    <a href="#certificates" class="nav-link text-gray-700 hover:text-blue-600">Certificates</a>
+                    <a href="#contact" class="nav-link text-gray-700 hover:text-blue-600">Contact</a>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button id="menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">Home</a>
+                <a href="#about" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">About</a>
+                <a href="#skills" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">Skills</a>
+                <a href="#education" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">Education</a>
+                <a href="#certificates" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">Certificates</a>
+                <a href="#contact" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero min-h-screen flex items-center pt-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0 animate-on-scroll">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">Hi, I'm <span class="text-blue-200">Mohamedh Vathudh</span></h1>
+                    <h2 class="text-2xl md:text-3xl text-blue-100 mb-6">Computer Science Engineer</h2>
+                    <p class="text-lg text-blue-50 mb-8 max-w-lg">Motivated and tech-savvy individual with a B.Tech degree in Computer Science Engineering, eager to utilize analytical skills and programming knowledge.</p>
+                    <div class="flex space-x-4">
+                        <a href="#contact" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition duration-300">Contact Me</a>
+                        <a href="#certificates" class="border-2 border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-600 transition duration-300">My Certificates</a>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center animate-on-scroll">
+                    <div id="avatar-container" class="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-lg overflow-hidden">
+                        <!-- Fallback content -->
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                            <i class="fas fa-user-cog text-white text-6xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">About <span class="text-blue-600">Me</span></h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Get to know more about me and my professional journey</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/3 mb-10 md:mb-0 flex justify-center animate-on-scroll">
+                    <div class="relative w-64 h-64 rounded-lg overflow-hidden shadow-lg">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700 opacity-90"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fas fa-user-tie text-white text-7xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-2/3 md:pl-12 animate-on-scroll">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-4">Who am I?</h3>
+                    <p class="text-gray-600 mb-6">I'm Mohamedh Vathudh, a passionate Computer Science Engineering student at BS Abdur Rahman Institute of Science and Technology, Chennai. I specialize in data analytics and programming with a strong foundation in Python, C++, and database management.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div>
+                            <p class="text-gray-600"><span class="font-medium text-gray-800">Name:</span> Mohamedh Vathudh</p>
+                            <p class="text-gray-600"><span class="font-medium text-gray-800">Email:</span> movat7262@gmail.com</p>
+                            <p class="text-gray-600"><span class="font-medium text-gray-800">Phone:</span> 6385332627</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-600"><span class="font-medium text-gray-800">From:</span> Pudupattinam, Kalpakkam</p>
+                            <p class="text-gray-600"><span class="font-medium text-gray-800">Date of Birth:</span> October 31, 2005</p>
+                            <p class="text-gray-600"><span class="font-medium text-gray-800">Languages:</span> English, Tamil, Hindi</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full flex items-center">
+                            <i class="fas fa-brain mr-2"></i>
+                            <span>Problem Solving</span>
+                        </div>
+                        <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full flex items-center">
+                            <i class="fas fa-search mr-2"></i>
+                            <span>Analytical Thinking</span>
+                        </div>
+                        <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full flex items-center">
+                            <i class="fas fa-comments mr-2"></i>
+                            <span>Communication</span>
+                        </div>
+                        <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full flex items-center">
+                            <i class="fas fa-users mr-2"></i>
+                            <span>Teamwork</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">My <span class="text-blue-600">Skills</span></h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Here are my technical skills and programming languages I work with</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-on-scroll">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6">Technical Skills</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">Python</span>
+                                <span class="text-blue-600">90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">C++</span>
+                                <span class="text-blue-600">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">C</span>
+                                <span class="text-blue-600">80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">SQL</span>
+                                <span class="text-blue-600">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-6">Professional Skills</h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">Data Analysis</span>
+                                <span class="text-blue-600">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">Problem Solving</span>
+                                <span class="text-blue-600">90%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">Communication</span>
+                                <span class="text-blue-600">80%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 80%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium text-gray-700">Teamwork</span>
+                                <span class="text-blue-600">85%</span>
+                            </div>
+                            <div class="skill-bar">
+                                <div class="skill-progress" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 animate-on-scroll">
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="text-blue-600 text-4xl mb-4">
+                        <i class="fab fa-python"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-800">Python</h4>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="text-blue-600 text-4xl mb-4">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-800">SQL</h4>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="text-blue-600 text-4xl mb-4">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-800">C++</h4>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+                    <div class="text-blue-600 text-4xl mb-4">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <h4 class="font-medium text-gray-800">Type Writing</h4>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Education Section -->
+    <section id="education" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">My <span class="text-blue-600">Education</span></h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">My academic journey and qualifications</p>
+            </div>
+            
+            <div class="relative animate-on-scroll">
+                <!-- Timeline bar -->
+                <div class="hidden md:block absolute left-1/2 h-full w-1 bg-blue-200 transform -translate-x-1/2"></div>
+                
+                <!-- Timeline items -->
+                <div class="space-y-8 md:space-y-16">
+                    <!-- Education Item 1 -->
+                    <div class="relative md:flex justify-center items-center">
+                        <div class="md:w-1/2 md:pr-12 md:text-right mb-4 md:mb-0">
+                            <h3 class="text-xl font-semibold text-gray-800">B.Tech in Computer Science Engineering</h3>
+                            <p class="text-blue-600">Jul 2023 – Present</p>
+                        </div>
+                        
+                        <div class="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white z-10">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        
+                        <div class="md:w-1/2 md:pl-12">
+                            <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                                <h4 class="font-medium text-gray-800 mb-2">BS Abdur Rahman Institute of Science and Technology, Chennai</h4>
+                                <p class="text-gray-600">Currently pursuing my Bachelor's degree in Computer Science Engineering with a focus on data analytics and programming.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certificates Section -->
+    <section id="certificates" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">My <span class="text-blue-600">Certificates</span></h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Professional certifications I've earned through dedicated learning</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Certificate 1 -->
+                <div class="card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl animate-on-scroll">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center">
+                        <i class="fas fa-certificate text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Advanced Data Analytics Training</h3>
+                        <p class="text-blue-600 mb-3">NULL CLASS — Mar 2025</p>
+                        <p class="text-gray-600">Completed advanced data analytics training covering data cleaning, visualization, and predictive modeling techniques.</p>
+                    </div>
+                </div>
+                
+                <!-- Certificate 2 -->
+                <div class="card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl animate-on-scroll">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center">
+                        <i class="fas fa-certificate text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">HackerRank Python Programming</h3>
+                        <p class="text-blue-600 mb-3">HACKER RANK — Nov 2024</p>
+                        <p class="text-gray-600">Certified in HackerRank Python Programming with a focus on algorithmic problem-solving and efficient coding practices.</p>
+                    </div>
+                </div>
+                
+                <!-- Certificate 3 -->
+                <div class="card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl animate-on-scroll">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center">
+                        <i class="fas fa-certificate text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">HackerRank SQL</h3>
+                        <p class="text-blue-600 mb-3">HACKER RANK — May 2025</p>
+                        <p class="text-gray-600">Earned HackerRank SQL certification demonstrating proficiency in complex data retrieval and database management techniques.</p>
+                    </div>
+                </div>
+                
+                <!-- Certificate 4 -->
+                <div class="card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl animate-on-scroll">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center">
+                        <i class="fas fa-certificate text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">PostgreSQL Training</h3>
+                        <p class="text-blue-600 mb-3">IIT BOMBAY — Apr 2025</p>
+                        <p class="text-gray-600">Completed intensive PostgreSQL training under the Spoken Tutorial Project at IIT Bombay, focusing on complex SQL queries and optimization.</p>
+                    </div>
+                </div>
+                
+                <!-- Certificate 5 -->
+                <div class="card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl animate-on-scroll">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center">
+                        <i class="fas fa-certificate text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Python Course</h3>
+                        <p class="text-blue-600 mb-3">IIT BOMBAY — Nov 2024</p>
+                        <p class="text-gray-600">Completed Spoken Tutorial Python course by IIT Bombay with hands-on programming experience in various Python applications.</p>
+                    </div>
+                </div>
+                
+                <!-- Certificate 6 -->
+                <div class="card bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl animate-on-scroll">
+                    <div class="h-48 bg-gradient-to-r from-blue-500 to-blue-700 flex items-center justify-center">
+                        <i class="fas fa-certificate text-white text-6xl"></i>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-2">Advanced C++ Training</h3>
+                        <p class="text-blue-600 mb-3">IIT BOMBAY — May 2024</p>
+                        <p class="text-gray-600">Acquired strong programming skills in C++ with emphasis on data structures and algorithms through IIT Bombay's certification program.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 animate-on-scroll">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Get In <span class="text-blue-600">Touch</span></h2>
+                <div class="w-20 h-1 bg-blue-600 mx-auto mb-6"></div>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">Feel free to contact me for any opportunities or collaborations</p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-12">
+                <div class="md:w-1/2 animate-on-scroll">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Contact Information</h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-envelope text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">Email</h4>
+                                <p class="text-gray-600">movat7262@gmail.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-phone-alt text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">Phone</h4>
+                                <p class="text-gray-600">6385332627</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-blue-100 p-3 rounded-full mr-4">
+                                <i class="fas fa-map-marker-alt text-blue-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800">Location</h4>
+                                <p class="text-gray-600">No.490 Mahatma Gandhi Nagar, Pudupattinam, Kalpakkam 603102</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10">
+                        <h3 class="text-2xl font-semibold text-gray-800 mb-6">Follow Me</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition duration-300">
+                                <i class="fab fa-linkedin-in text-xl"></i>
+                            </a>
+                            <a href="#" class="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition duration-300">
+                                <i class="fab fa-github text-xl"></i>
+                            </a>
+                            <a href="#" class="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition duration-300">
+                                <i class="fab fa-twitter text-xl"></i>
+                            </a>
+                            <a href="#" class="bg-blue-100 text-blue-600 w-12 h-12 rounded-full flex items-center justify-center hover:bg-blue-600 hover:text-white transition duration-300">
+                                <i class="fab fa-instagram text-xl"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 animate-on-scroll">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6">Send Me a Message</h3>
+                    <form class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-gray-700 mb-2">Your Name</label>
+                            <input type="text" id="name" class="contact-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Enter your name">
+                        </div>
+                        
+                        <div>
+                            <label for="email" class="block text-gray-700 mb-2">Your Email</label>
+                            <input type="email" id="email" class="contact-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Enter your email">
+                        </div>
+                        
+                        <div>
+                            <label for="subject" class="block text-gray-700 mb-2">Subject</label>
+                            <input type="text" id="subject" class="contact-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Enter subject">
+                        </div>
+                        
+                        <div>
+                            <label for="message" class="block text-gray-700 mb-2">Your Message</label>
+                            <textarea id="message" rows="5" class="contact-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Enter your message"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-300 w-full">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <p>&copy; 2023 Mohamedh Vathudh. All rights reserved.</p>
+                </div>
+                <div class="flex space-x-6">
+                    <a href="#" class="hover:text-blue-400 transition duration-300">Privacy Policy</a>
+                    <a href="#" class="hover:text-blue-400 transition duration-300">Terms of Service</a>
+                    <a href="#" class="hover:text-blue-400 transition duration-300">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-blue-600 text-white w-12 h-12 rounded-full shadow-lg hidden items-center justify-center hover:bg-blue-700 transition duration-300">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+        
+        // Back to top button
+        const backToTopBtn = document.getElementById('back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.remove('hidden');
+                backToTopBtn.classList.add('flex');
+            } else {
+                backToTopBtn.classList.add('hidden');
+                backToTopBtn.classList.remove('flex');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Animation on scroll
+        const animateElements = document.querySelectorAll('.animate-on-scroll');
+        
+        const animateOnScroll = () => {
+            animateElements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const windowHeight = window.innerHeight;
+                
+                if (elementPosition < windowHeight - 100) {
+                    element.classList.add('visible');
+                }
+            });
+        };
+        
+        // Initial check
+        animateOnScroll();
+        
+        // Check on scroll
+        window.addEventListener('scroll', animateOnScroll);
+        
+        // Form submission
+        const contactForm = document.querySelector('form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                // Get form values
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+                
+                // Here you would typically send the form data to a server
+                // For this example, we'll just show an alert
+                alert(`Thank you, ${name}! Your message has been received. I'll get back to you soon.`);
+                
+                // Reset form
+                contactForm.reset();
+            });
+        }
+    </script>
+
+    <script>
+        // 3D Avatar Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('avatar-container');
+            if (!container) return;
+
+            // Scene setup
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setClearColor(0x000000, 0);
+            container.innerHTML = '';
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+
+            // Avatar model (using placeholder geometry)
+            const createAvatarScene = () => {
+                // Create a developer character
+                const developer = new THREE.Group();
+                
+                // Head
+                const head = new THREE.Mesh(
+                    new THREE.SphereGeometry(0.8, 32, 32),
+                    new THREE.MeshPhongMaterial({ color: 0xFFD700 })
+                );
+                developer.add(head);
+                
+                // Body
+                const body = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.5, 2, 0.8),
+                    new THREE.MeshPhongMaterial({ color: 0x4682B4 })
+                );
+                body.position.y = -1.5;
+                developer.add(body);
+                
+                // Arms
+                const leftArm = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.2, 0.2, 1.5, 8),
+                    new THREE.MeshPhongMaterial({ color: 0x4682B4 })
+                );
+                leftArm.position.set(-1, -1, 0);
+                leftArm.rotation.z = Math.PI / 4;
+                developer.add(leftArm);
+                
+                const rightArm = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.2, 0.2, 1.5, 8),
+                    new THREE.MeshPhongMaterial({ color: 0x4682B4 })
+                );
+                rightArm.position.set(1, -1, 0);
+                rightArm.rotation.z = -Math.PI / 4;
+                developer.add(rightArm);
+                
+                // Laptop
+                const laptopBase = new THREE.Mesh(
+                    new THREE.BoxGeometry(2, 0.2, 1.5),
+                    new THREE.MeshPhongMaterial({ color: 0x333333 })
+                );
+                laptopBase.position.set(0, -1.5, 0.2);
+                
+                const laptopScreen = new THREE.Mesh(
+                    new THREE.BoxGeometry(1.8, 0.1, 1.2),
+                    new THREE.MeshPhongMaterial({ 
+                        color: 0x000000,
+                        emissive: 0x00BFFF,
+                        emissiveIntensity: 0.5
+                    })
+                );
+                laptopScreen.position.set(0, -0.8, -0.1);
+                laptopScreen.rotation.x = -Math.PI / 4;
+                
+                const laptop = new THREE.Group();
+                laptop.add(laptopBase);
+                laptop.add(laptopScreen);
+                developer.add(laptop);
+                
+                // Database server
+                const server = new THREE.Mesh(
+                    new THREE.BoxGeometry(1, 2, 1),
+                    new THREE.MeshPhongMaterial({ color: 0x2E8B57 })
+                );
+                server.position.set(2, 0, 0);
+                
+                // Add some server details
+                for (let i = 0; i < 5; i++) {
+                    const led = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.05, 8, 8),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0x00FF00,
+                            emissive: 0x00FF00,
+                            emissiveIntensity: 0.5
+                        })
+                    );
+                    led.position.set(0.6, 1.5 - i * 0.5, 0);
+                    server.add(led);
+                }
+                
+                // Code particles
+                const codeParticles = new THREE.Group();
+                for (let i = 0; i < 50; i++) {
+                    const particle = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.05, 4, 4),
+                        new THREE.MeshPhongMaterial({ 
+                            color: 0xFFFFFF,
+                            emissive: 0x00BFFF,
+                            emissiveIntensity: 0.5
+                        })
+                    );
+                    particle.position.set(
+                        Math.random() * 4 - 2,
+                        Math.random() * 3 - 1.5,
+                        Math.random() * 2 - 1
+                    );
+                    codeParticles.add(particle);
+                }
+                
+                scene.add(developer);
+                scene.add(server);
+                scene.add(codeParticles);
+                
+                // Animation
+                const animate = () => {
+                    requestAnimationFrame(animate);
+                    
+                    // Rotate developer slightly
+                    developer.rotation.y = Math.sin(Date.now() * 0.001) * 0.2;
+                    
+                    // Make code particles float around
+                    codeParticles.children.forEach((particle, i) => {
+                        particle.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
+                        particle.position.x += Math.cos(Date.now() * 0.001 + i) * 0.01;
+                    });
+                    
+                    // Make server LEDs blink
+                    server.children.forEach((led, i) => {
+                        if (Math.random() > 0.9) {
+                            led.material.emissiveIntensity = 0.5 + Math.random();
+                        }
+                    });
+                    
+                    renderer.render(scene, camera);
+                };
+                
+                // Camera position
+                camera.position.z = 5;
+                camera.position.y = 1;
+                
+                // Add orbit controls for debugging
+                // const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                // controls.enableDamping = true;
+                
+                animate();
+            };
+            
+            createAvatarScene();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        });
+    </script>
+</body>
+</html>
